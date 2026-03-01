@@ -131,7 +131,7 @@
 !* Fortran 2003 of gfortran:                                     *
 !*                                                               *
 !% mpif90 -mcmodel=medium -fpic -O2 -o ax.out @spin_SMD7a.f03 -I/opt/fftw3/include -L/opt/fftw3/lib -lfftw3 &> log
-!% mpiexec -n <proc> ax.out &  <proc>=5 or odd integer                                         *
+!% mpiexec -n 5 ax.out &  <proc>=5 or odd integer                *
 !* Debian-13: -fallow-argument-mismatch                          *
 !*****************************************************************
 !   if(rank.eq.0) then, call magnetiz in every step, L.1675
@@ -1331,8 +1331,15 @@
 !              !<-- ksrart= 1
  3000 continue
 !                                           *****
-      fw= fw00*(1.d0-exp(-(t8-t8_start)/tau_b)) &
+      t8_start= 400.d0
+!
+      if(t8.lt.t8_start) then
+        fw= fw00
+      else
+        fw= fw00*(1.d0-exp(-(t8-t8_start)/tau_b)) &
                                 * sin(omg_b*(t8-t8_start))  ! -M*B < 0
+      end if
+!
       bex= Bapx*fw
       bey= Bapy*fw
       bez= Bapz*fw +Bstat*fw00
