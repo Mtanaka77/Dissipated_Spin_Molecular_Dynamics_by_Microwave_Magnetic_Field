@@ -1331,7 +1331,7 @@
 !              !<-- ksrart= 1
  3000 continue
 !                                           *****
-      t8_start= 400.d0
+      t8_start= 100.d0
 !
       if(t8.lt.t8_start) then
         fw= fw00
