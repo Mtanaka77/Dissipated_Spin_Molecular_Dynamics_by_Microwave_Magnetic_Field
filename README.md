@@ -31,8 +31,8 @@ constant magnetic field B_z0= 10^4 gauss, and the initial temperture 200 K.
 The total energy U_sys and the time derivative dU_sys/dt are shown as 
 the proof of our theory of sintering, Ref. 2. 
 
-We see a similar magnetic heating for a non-constant magnetic field Bz0= 0,
-but the maximum temperatare is 1,050 Celsius.
+We see a similar magnetic heating for a non-constant magnetic field case Bz0= 0,
+but the maximum temperatare is smaller as 1,050 Celsius.
 
 ## Numerical Code, Parameters and Files
 
