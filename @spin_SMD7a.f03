@@ -6,9 +6,9 @@
 !*        Author: Motohiko Tanaka, PhD, Chikusa,Nagoya,Japan.    *
 !*        https://github.com/Mtanaka77/                          *
 !*                                                               *
-!*       @spin_SMD5a.f03: Numerical code                         *
+!*       @spin_SMD7a.f03: Numerical code                         *
 !*       param-spinRL7.h: Basic parameters                       *
-!*       SAI105_config.START1: Configuration file                *
+!*       SAI107_config.START1: Configuration file                *
 !*       magnetite8.xyz:  Initial xyz file                       * 
 !*                                                               *
 !*   Spin dynamics under the microwave B field for electrons,    *
@@ -346,7 +346,7 @@
                  n_of_j,np10,np100,ia,ja,ka,i1x,i2x,i1y,i2y,i1z,i2z, &
                  n_MCsteps,nt_p3m
 !
-      real(C_DOUBLE) t8,dt,dt0,dth,Bex,Bey,Bez,spin2,spin3,     &
+      real(C_DOUBLE) t8,dt,dt0,dth,bex,bey,bez,spin2,spin3,     &
                  Jaa,Jbb,Jab,J00,B00,Bapx,Bapy,Bapz,Bap,Bstat,  &
                  tau_b,tau_diss,t_adv,fw,fw00,                  &
                  Temp,TCurie,g,mue_B,hbar,KJoule,Kcal,mol,kT,eV,&
@@ -392,10 +392,10 @@
                     spx4(np0),spy4(np0),spz4(np0),    &
                     ch4(np0),x4(np0),y4(np0),z4(np0), &
                     vx4(np0),vy4(np0),vz4(np0)
-      real(C_DOUBLE) wx,wy,wz,wn,wsx,wsy,wsz,wp, &
-                    wx1,wy1,wz1,wn1,uav,wt1,wx7,wy7,wz7,wn7,uav7,wt7,  &
-                    ssx,ssy,ssz,tht,phi,psi,bbw,tsz0,atsz,av_tsz(nhs), &
-                    ub,um,ub1,um1,uu1(7),uu2(7),ranff,ds1,ds2
+      real(C_DOUBLE) wx,wy,wz,wsx,wsy,wsz,wx1,wy1,wz1,uav,wx7,wy7,wz7, &
+                    uav7,ssx,ssy,ssz,tht,phi,psi,bbw,tsz0,atsz,        &
+                    av_tsz(nhs),ub,um,ub1,um1,uu1(5),uu2(5),ranff,ds1,ds2
+      integer(C_INT) wn7,wt7,wn,wt,wn1,wt1,uu1i(2),uu2i(2)
       common/ehist/ spinx(nhs),spinz(nhs),spin7(nhs),                   &
                     Bextx(nhs),Bextz(nhs),magx(nhs),magy(nhs),magz(nhs),&
                     Usys(nhs),conv(nhs),aitr(nhs),psdt(nhs),tfix(nhs),  &
@@ -1028,7 +1028,7 @@
 !
       if(kstart.eq.1) del_en= 0
 !
-!                     !<<-- go to 1000: 250 lines below
+!                     !<<-- go to 1000: 270 lines below
  1000 continue
       dth= 0.5d0*dt
 !
@@ -1040,11 +1040,11 @@
 !  time synchronization is achieVed here...
 !
       call clocks (cputime,wtime)
-      if(t8.gt.tmax) istop= 1
-      if(wtime/60.d0.gt.cptot) istop= 1
+      if(t8.gt.tmax) go to 7000            !istop= 1
+      if(wtime/60.d0.gt.cptot) go to 7000  !istop= 1
 !
-      call mpi_bcast (istop,1,mpi_integer,0,mpi_comm_world,ierror)
-      if(istop.eq.1) go to 7000
+!     call mpi_bcast (istop,1,mpi_integer,0,mpi_comm_world,ierror)
+!     if(istop.eq.1) go to 7000
 !
 !     if(kstart.ne.0) then
 !       dtwr =  tau_b/80.d0
@@ -1075,12 +1075,12 @@
 !
         if(MC_first) then   ! Organize a seed one cell
           np100= np10       ! one cell
-          nstep_MC = 50001
-          kwrite   = 10000
+          nstep_MC = 300000      ! may not be good !
+          kwrite   =  50000
         else                ! Initialize a large system with the organized seed cell
           np100= np1        ! all cells 
-          nstep_MC = n_MCsteps  ! 1000001 
-          kwrite   =   50000    !   50000
+          nstep_MC = n_MCsteps  ! 770001 
+          kwrite   =   50000    !  50000
         end if
 !
         if(rank.eq.0) then
@@ -1123,7 +1123,7 @@
           end if
         end if
 !
-        go to 3000    !!<-- 3000: 211 lines below 
+        go to 3000    !!<-- 3000: 210 lines below 
       end if
 !
 !**************************************
@@ -1159,8 +1159,9 @@
 !
 !* Calculating pairs both ways - 0.5*
 !
-      u1= 0.d0
       if(MC_first) then
+!
+        u1= 0.d0
 !
         do 200 i= 1,np100
         u1= u1 + b1 * (Bex*spx00(i) +Bey*spy00(i) +Bez*spz00(i))
@@ -1192,6 +1193,8 @@
 !
 !* Divided upon processors for a large system... (11/12/2010)
 !
+        u1= 0.d0
+!
         do 220 i= i1(rank),i2(rank)
         u1= u1 + b1 * (Bex*spx00(i) +Bey*spy00(i) +Bez*spz00(i))
 !
@@ -1208,7 +1211,7 @@
       end if
 !
 !*****************************************************
-!* Apply the Metropolis criterion when u increases   *
+!* Apply the Metropolis criterion when U increases   *
 !*****************************************************
 !
       if(u1.lt.u) then            ! Accept the flip
@@ -1252,6 +1255,7 @@
       if(i_MC.lt.nstep_MC) go to 2300
 !     -------------------------------
 !
+!
       if(MC_first) then
         MC_first= .false.
 !      ++++++++++++++++++
@@ -1267,7 +1271,7 @@
            mod(ja,3).eq.0 .and. &
            mod(ka,3).eq.0) then
 !
-! Seed cell
+! Seed cell and multi-cells
           do 240 l= 1,np10
           i= i +1
           spx(i)= spx00(l)  ! spx() are used in MD
@@ -1276,7 +1280,7 @@
   240     continue
 !
         else
-          do 243 l= 1,np10
+          do 243 l= 1,np10  !! np10 for each cell
           i= i +1
 !
 ! To avoid always being s=0... 11/23/2010
@@ -1298,7 +1302,7 @@
           close (11)
         end if
 !
-        go to 2100      !<-- 1000: 247 lines above
+        go to 2100      !<-- 1000: 270 lines above
 !
       else
         do 250 i= 1,np1
@@ -1313,9 +1317,11 @@
       end if
 !
       kstart= 1
-      it= 0   !<<-- 
-      t8= 0
+      it= 0          !<<-- 
+      t8= 0.d0
+!
       go to 1000     !<-- 1000: 326 lines above
+!
 !
 !-----------------------------------------------------------
 !* Spin dynamics with dissipation
@@ -1403,13 +1409,12 @@
 !
 !* RHS
       hh2= dth/tau_diss
-      rsx= spx(i) +dth*(spy(i)*qsz -spz(i)*qsy)       &
-                            -hh2*(spx(i) -2.d0*aspx(i)) 
-      rsy= spy(i) +dth*(spz(i)*qsx -spx(i)*qsz)       &
-                            -hh2*(spy(i) -2.d0*aspy(i)) 
-      rsz= spz(i) +dth*(spx(i)*qsy -spy(i)*qsx)       &
-                            -hh2*(spz(i) -2.d0*aspz(i)) 
-!                        -dt*(spz/2 -spz_0)/tau_diss
+      rsx= spx(i) +dth*(spy(i)*qsz -spz(i)*qsy) !&
+!                    -hh2*(spx(i) -2.d0*aspx(i))
+      rsy= spy(i) +dth*(spz(i)*qsx -spx(i)*qsz) !&
+!                    -hh2*(spy(i) -2.d0*aspy(i))
+      rsz= spz(i) +dth*(spx(i)*qsy -spy(i)*qsx) &
+                     -hh2*(spz(i) -2.d0*aspz(i))
 ! RHS_para
       qq  = qsx**2 +qsy**2 +qsz**2
       rqq = (rsx*qsx +rsy*qsy +rsz*qsz)/qq
@@ -1619,9 +1624,9 @@
       if(if_LJ0) then
         if_LJ0= .false.
 !
-        e_sp0= e_sp
+        e_sp0 = e_sp
         e_c_r0= e_c_r
-        e_LJ0= e_LJ
+        e_LJ0 = e_LJ
       end if
 !
       e_sp1 = (e_sp  -e_sp0) /(np1+np2)
@@ -1724,34 +1729,36 @@
       call magnetiz (spx,spy,spz,g,wx1,wy1,wz1,wn1,u1,uav,wt1,     &
                                                        rank,i1,i2,1)
 !
-      uu1(1)= wx1
-      uu1(2)= wy1
-      uu1(3)= wz1
-      uu1(4)= wn1
-      uu1(5)= wt1
-      uu1(6)= u1
-      uu1(7)= uav
+      if(iwrt1.eq.0) then 
+        uu1(1)= wx1
+        uu1(2)= wy1
+        uu1(3)= wz1
+        uu1(4)= u1
+        uu1(5)= uav
+        uu1i(1)= wn1
+        uu1i(2)= wt1
 !
-      cnt_send= i2(rank) -i1(rank) +1
-      call mpi_allgatherv (uu1,cnt_send,            mpi_real8, &
-                           uu2,cnt_recv0,disp_recv0,mpi_real8, &
-                           mpi_comm_world,ierror)
+        call mpi_allreduce (uu1,uu2,  5,mpi_real8,  mpi_sum, &
+                            mpi_comm_world,ierror)
+        call mpi_allreduce (uu1i,uu2i,2,mpi_integer,mpi_sum, &
+                            mpi_comm_world,ierror)
 !
-      wx1= uu2(1)
-      wy1= uu2(2)
-      wz1= uu2(3)
-      wn1= uu2(4)
-      wt1= uu2(5)
-      u1 = uu2(6)
-      uav= uu2(7)
+        wx1= uu2(1)
+        wy1= uu2(2)
+        wz1= uu2(3)
+        u1 = uu2(4)
+        uav= uu2(5)
+        wn1= uu2i(1)
+        wt1= uu2i(2)
 !
+!  Average on Root, ic= 7 
+!     call magnetiz (spx,spy,spz,g,wx1,wy1,wz1,wn1,u1,uav,wt1,     &
+!                                                      rank,i1,i2,7)
+      end if
+! 
 ! 
       if(rank.eq.0) then
 !***
-!  Average on Root, ic= 7 
-      call magnetiz (spx,spy,spz,g,wx1,wy1,wz1,wn1,u1,uav,wt1,     &
-                                                       rank,i1,i2,7)
-!
       if(iwrt1.eq.0) then
         magx(is)= wx1  ! m= -g*mue_B*s
         magy(is)= wy1  ! u= -m dot b = g*mue_B s*b 
@@ -3162,9 +3169,9 @@
       implicit  none
       include  'param-spinRL7.h'
 !
-      real(C_DOUBLE) spx(np0),spy(np0),spz(np0),g,wx,wy,wz,wn, &
-                     u,uav,wt,wx1,wy1,wz1,u1
-      integer(C_INT) np,ic,i
+      real(C_DOUBLE) spx(np0),spy(np0),spz(np0),g,wx,wy,wz,u,uav, &
+                     wx1,wy1,wz1,u1
+      integer(C_INT) np,wn,wt,ic,i
 !
 ! ic< 0: Reset and get instantaneous values
 ! ic= 0: Reset
@@ -3218,11 +3225,10 @@
       implicit  none
       include  'param-spinRL7.h'
 !
-      real(C_DOUBLE) spx(np0),spy(np0),spz(np0),g,wx,wy,wz,wn, &
-                     u,uav,wt,wx1,wy1,wz1,u1
-      integer(C_INT) ic,i,rank,i1(0:num_proc),i2(0:num_proc)
+      real(C_DOUBLE) spx(np0),spy(np0),spz(np0),g,wx,wy,wz, &
+                     u,uav,wx1,wy1,wz1,u1
+      integer(C_INT) wn,wt,ic,rank,i,i1(0:num_proc),i2(0:num_proc)
 !
-! ic< 0: Reset and get instantaneous values
 ! ic= 0: Reset
 ! ic= 1: Add
 ! ic= 7: Get averaged value
@@ -3334,7 +3340,7 @@
 !     read (08,'(a40,i10)')   text1,mx      ! Number of domains
 !     read (08,'(a40,i10)')   text1,my      !    <--param.h, meshx= 5
 !     read (08,'(a40,i10)')   text1,mz      ! 
-      read (08,'(a40,i10)')   text1,n_MCsteps ! Maximum iteration count of MC
+      read (08,'(a40,i10)')  text1,n_MCsteps ! Maximum iterations of the MC step
       read (08,'(a40,f20.0)') text1,rcut    ! Cutoff radius of spin interaction
       read (08,'(a40,f20.0)') text1,rcutC   ! Cutoff radius of ES interaction
       read (08,'(a40,i10)')   text1,itermax ! Maximum iteration of nonlinear solver 
