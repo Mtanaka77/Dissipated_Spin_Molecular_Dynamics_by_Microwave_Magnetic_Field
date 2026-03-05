@@ -1,6 +1,6 @@
 # Spin_molecular_dynamics_by_magnetic_microwaves
 
-## Microwave sintering Experiments and Theory
+## Microwave sintering experiments and theory
 
 We can place microwave magnetic field to heat metal oxide of magnetite at 
 1,300 Celsius, which is above the Curie temperatre 585 Celsius.
@@ -11,7 +11,7 @@ Later, theory and numerical simulation were used in identifying unpaired 3d
 electron spins of Fe(3+) and Fe(2+) irons to increase much above the Curie 
 temperature (M. Tanaka et al., Phys. Rev. B, 2009), Ref.2.  
 
-## Simulation Procedures and Our Theory
+## Simulation procedures and our theory
 
 Electron spins of Fe(3+), Fe(2+) and O(2-) in cubic cells
 
@@ -31,7 +31,7 @@ constant magnetic field B_z0= 10^4 gauss, and the initial temperture 200 K.
 The total energy U_sys and the time derivative dU_sys/dt are shown as 
 the proof of our theory of sintering, Ref. 2. 
 
-## Numerical Code, Parameters and Files
+## Numerical code, parameters and files
 
 1) @spin_SMD7a.f03: Dissipative spin molecular dynamics. An odd number of processors
 in the z direction is required for your choice. Read the simulation code and parameters
