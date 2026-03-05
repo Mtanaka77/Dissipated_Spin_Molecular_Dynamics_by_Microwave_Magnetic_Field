@@ -1,4 +1,4 @@
-# Spin_molecular_dynamics_by_magnetic_microwaves
+# Spin Molecular Dynamics by Magnetic Microwaves
 
 ## Microwave sintering experiments and theory
 
