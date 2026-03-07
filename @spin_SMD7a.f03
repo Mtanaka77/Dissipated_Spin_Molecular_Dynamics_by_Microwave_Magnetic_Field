@@ -525,7 +525,6 @@
                       Jaa,Jbb,Jab,rcut,rcutC 
         write(11,'(" dt  =",1pd11.3,/," tolerance =",d11.3,/)') dt,toler
   933   format(' Applied H field(/100gauss) = ',3f8.1,/,&
-               '    Bstat(/100gauss) =',f8.1,/, &
                ' Jaa(meV) = ',1pd11.3,/, &
                ' Jbb(meV) = ',d11.3,/,   &
                ' Jab(meV) = ',d11.3,/,   &
