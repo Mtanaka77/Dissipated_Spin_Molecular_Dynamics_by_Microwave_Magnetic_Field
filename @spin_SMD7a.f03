@@ -1407,10 +1407,8 @@
 !
 !* RHS
       hh2= dth/tau_diss
-      rsx= spx(i) +dth*(spy(i)*qsz -spz(i)*qsy) &
-                     -hh2*(spx(i) -2.d0*aspx(i))
-      rsy= spy(i) +dth*(spz(i)*qsx -spx(i)*qsz) &
-                     -hh2*(spy(i) -2.d0*aspy(i))
+      rsx= spx(i) +dth*(spy(i)*qsz -spz(i)*qsy)
+      rsy= spy(i) +dth*(spz(i)*qsx -spx(i)*qsz)
       rsz= spz(i) +dth*(spx(i)*qsy -spy(i)*qsx) &
                      -hh2*(spz(i) -2.d0*aspz(i))
 ! RHS_para
