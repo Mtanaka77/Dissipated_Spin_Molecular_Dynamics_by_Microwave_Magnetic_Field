@@ -10,7 +10,7 @@ Microwave sintering was tested by experiments and good quarity irons were create
 Later, theory and numerical simulation were used to identify unpaired 3d 
 electron spins of Fe(3+) and Fe(2+) irons to increase much above the Curie 
 temperature (M. Tanaka et al., Phys. Rev. B, 2009), Ref.2. The recent 
-simulations of the Fotran 2003/2008 code reproduce the magnetic field sintering.
+simulations of the Fortran 2003/2008 code reproduce the magnetic field sintering.
 
 ## Simulation procedures and our theory
 
