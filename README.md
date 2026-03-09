@@ -1,21 +1,22 @@
-# Spin Molecular Dynamics by Magnetic Microwaves
+# Spin Dissipated Molecular Dynamics by Magnetic Microwaves
 
-## Microwave sintering experiments and theory
+## Microwave sintering experiments and its theory
 
-We can place microwave magnetic field to heat metal oxide of magnetite at 
-1,300 Celsius, which is above the Curie temperatre 585 Celsius.
+We will put microwave magnetic field to heat metal oxide of magnetite 
+which is above the Curie temperatre 585 Celsius to 1300 Celsius.
 Microwave sintering was tested by experiments and good quarity irons were created 
 (R. Roy et. al., Nature, 1999), Ref.1.  
 
-Later, theory and numerical simulation were used in identifying unpaired 3d 
+Later, theory and numerical simulation were used to identify unpaired 3d 
 electron spins of Fe(3+) and Fe(2+) irons to increase much above the Curie 
 temperature (M. Tanaka et al., Phys. Rev. B, 2009), Ref.2.  
+
 
 ## Simulation procedures and our theory
 
 Electron spins of Fe(3+), Fe(2+) and O(2-) in cubic cells
 
-Magnetic microwaves of giga-Hertz frequency, like 2.5 GHz
+Magnetic microwaves of giga-Hertz frequency that is 2.5 GHz
 
 Metropolis criterion is used to accept/reject in the MC cycle
 
@@ -29,7 +30,9 @@ The peak of the time derivative dU_sys/dt corresponds to the Curie temperatre
 of 858 K (585 C) with the sinusoidal magnetic field Bz= 5,000 gauss, the 
 constant magnetic field B_z0= 2x10^4 gauss, and the initial temperture 200 K.
 The total energy U_sys and the time derivative dU_sys/dt in sai123a.pdf 
-are shown as the proof of our theory of microwave magnetic sintering, Ref. 2. 
+are shown for these temperatures, as the proof of our theory of 
+microwave magnetic sintering, Ref. 2. 
+
 
 ## Numerical code, parameters and files
 
@@ -37,7 +40,7 @@ are shown as the proof of our theory of microwave magnetic sintering, Ref. 2.
 in the z direction is required for your choice. Read the simulation code and parameters
 for details !!
 
-3) param_spinRL7.h: Parameters 
+2) param_spinRL7.h: Parameters 
 
  > number of processors (nodes), total cells of irons and oxygens (odd numbers such as 5x5x5 nodes),
 p3m resolution
@@ -50,6 +53,7 @@ p3m resolution
 
 4) Magnetite in a cubic lattice: magnetite8.xyz for initialization of 
 the a,b,c cell
+
 
 ## References
 
