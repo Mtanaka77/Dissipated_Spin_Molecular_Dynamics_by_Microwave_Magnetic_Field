@@ -31,7 +31,8 @@ of 858 K (585 C) with the sinusoidal magnetic field Bz= 5,000 gauss, the
 constant magnetic field B_z0= 2x10^4 gauss, and the initial temperture 200 K.
 The total energy U_sys and the time derivative dU_sys/dt in sai123a.pdf 
 are shown for these temperatures, as the proof of our theory of 
-microwave magnetic sintering, Ref. 2. 
+microwave magnetic sintering, Ref. 2. Recent simulations with Fortran 2003/2008
+and MPICH4, with the code update, are the same result of microwave magnetic sintering. 
 
 
 ## Numerical code, parameters and files
