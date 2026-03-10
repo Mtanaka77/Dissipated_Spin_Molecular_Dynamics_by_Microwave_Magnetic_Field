@@ -1,14 +1,14 @@
 !*****************************************************************
 !*                                                               *
-!*   ### Dissipative Spin Molecular Dynamics Simulation ###      * 
+!*   ### Spin Dissipative Molecular Dynamics Simulation ###      * 
 !*                                                               *
 !*      Numerical code by:                                       *
 !*        Author: Motohiko Tanaka, PhD, Chikusa,Nagoya,Japan.    *
 !*        https://github.com/Mtanaka77/                          *
 !*                                                               *
-!*       @spin_SMD5a.f03: Numerical code                         *
+!*       @spin_SMD7a.f03: Numerical code                         *
 !*       param-spinRL7.h: Basic parameters                       *
-!*       SAI105_config.START1: Configuration file                *
+!*       SAI107_config.START1: Configuration file                *
 !*       magnetite8.xyz:  Initial xyz file                       * 
 !*                                                               *
 !*   Spin dynamics under the microwave B field for electrons,    *
@@ -1405,13 +1405,13 @@
       qsy= qsy -g1*bey
       qsz= qsz -g1*bez
 !
-!* RHS
+!* RHS of t8 -> t8+dth
       hh2= dth/tau_diss
       rsx= spx(i) +dth*(spy(i)*qsz -spz(i)*qsy -spx(i)/tau_diss)
       rsy= spy(i) +dth*(spz(i)*qsx -spx(i)*qsz -spy(i)/tau_diss)
-      rsz= spz(i) +dth*(spx(i)*qsy -spy(i)*qsx &
-                                    -(spz(i) -aspz(i))/tau_diss) 
-! RHS_para
+      rsz= spz(i) +dth*(spx(i)*qsy -spy(i)*qsx   &
+                                   -(spz(i) -2.d0*aspz(i))/tau_diss) 
+!* RHS_para
       qq  = qsx**2 +qsy**2 +qsz**2
       rqq = (rsx*qsx +rsy*qsy +rsz*qsz)/qq
 !
