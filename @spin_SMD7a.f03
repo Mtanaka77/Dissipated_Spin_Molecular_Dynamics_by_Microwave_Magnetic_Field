@@ -384,11 +384,11 @@
       common/ranfff/ ir0
       common/itera/  toler,itermax
 !
-      real(C_float) spinx,spinz,spin7,Bextx,Bextz,magx,magy,magz, &
+      real(C_float) spinx,spinz,spin7,bextx,bextz,magx,magy,magz, &
                     Usys,conv,aitr,psdt,tfix,Uss,Usb,tsx,tsy,tsz,sum_mb,&
                     U_Fe,U_O,ds_Fe,ds_O,timeh,dtrhs
       real(C_float) sx1(3),sy1(3),sz1(3),sx2(3),sy2(3),sz2(3),sn1(3), &
-                    csx,csy,csz,axis(100),freq(100),t4,Bex4,Bez4, &
+                    csx,csy,csz,axis(100),freq(100),t4,bex4,bez4, &
                     spx4(np0),spy4(np0),spz4(np0),    &
                     ch4(np0),x4(np0),y4(np0),z4(np0), &
                     vx4(np0),vy4(np0),vz4(np0)
@@ -397,7 +397,7 @@
                     av_tsz(nhs),ub,um,ub1,um1,uu1(5),uu2(5),ranff,ds1,ds2
       integer(C_INT) wn7,wt7,wn,wt,wn1,wt1,uu1i(2),uu2i(2)
       common/ehist/ spinx(nhs),spinz(nhs),spin7(nhs),                   &
-                    Bextx(nhs),Bextz(nhs),magx(nhs),magy(nhs),magz(nhs),&
+                    bextx(nhs),bextz(nhs),magx(nhs),magy(nhs),magz(nhs),&
                     Usys(nhs),conv(nhs),aitr(nhs),psdt(nhs),tfix(nhs),  &
                     Uss(nhs),Usb(nhs),tsx(nhs,3),tsy(nhs,3),tsz(nhs,3), &
                     sum_mb(nhs),U_Fe(nhs),U_O(nhs),ds_Fe(nhs),ds_O(nhs),&
@@ -499,7 +499,7 @@
         read(12) np1,np2,spec,site,nintS,lintS,nintC,lintC,if_LJ
         read(12) i1,i2,i3,i4,disp_recv,cnt_recv,disp_recvC,cnt_recvC, &
                  disp_recv0,cnt_recv0
-        read(12) spinx,spinz,spin7,Bextx,Bextz,magx,magy,magz,       &
+        read(12) spinx,spinz,spin7,bextx,bextz,magx,magy,magz,       &
                  Usys,conv,aitr,psdt,tfix,Uss,Usb,tsx,tsy,tsz,sum_mb,&
                  U_Fe,U_O,timeh
         close(12)
@@ -1162,7 +1162,7 @@
         u1= 0.d0
 !
         do 200 i= 1,np100
-        u1= u1 + b1 * (Bex*spx00(i) +Bey*spy00(i) +Bez*spz00(i))
+        u1= u1 + b1 * (bex*spx00(i) +bey*spy00(i) +bez*spz00(i))
 !
         do 210 l= 1,np10
         if(l.eq.i) go to 210
@@ -1194,7 +1194,7 @@
         u1= 0.d0
 !
         do 220 i= i1(rank),i2(rank)
-        u1= u1 + b1 * (Bex*spx00(i) +Bey*spy00(i) +Bez*spz00(i))
+        u1= u1 + b1 * (bex*spx00(i) +bey*spy00(i) +bez*spz00(i))
 !
         do 220 k= 1,nintS(i)
         l= lintS(k,i)
@@ -1235,7 +1235,7 @@
       if(mod(i_MC,kwrite).eq.1) then  !                                 Average                
         call magnetiz7 (spx00,spy00,spz00,g,wx7,wy7,wz7,wn7,u1,uav7,wt7,np100,7)
 !                                                                        +++++ 
-        bbw= B00*Bez
+        bbw= B00*bez
         if(rank.eq.0) then
           open (unit=11,file=praefixc//'.11'//suffix2, &
                     status='unknown',position='append',form='formatted')
@@ -1401,16 +1401,16 @@
 !*               where qq= sum_j (2*Jij*s_j) -g*mue_B*B  *
 !*********************************************************
 !
-      qsx= qsx -g1*Bex
-      qsy= qsy -g1*Bey
-      qsz= qsz -g1*Bez
+      qsx= qsx -g1*bex
+      qsy= qsy -g1*bey
+      qsz= qsz -g1*bez
 !
 !* RHS
       hh2= dth/tau_diss
-      rsx= spx(i) +dth*(spy(i)*qsz -spz(i)*qsy)
-      rsy= spy(i) +dth*(spz(i)*qsx -spx(i)*qsz)
-      rsz= spz(i) +dth*(spx(i)*qsy -spy(i)*qsx) &
-                     -hh2*(spz(i) -2.d0*aspz(i))
+      rsx= spx(i) +dth*(spy(i)*qsz -spz(i)*qsy -spx(i)/tau_diss)
+      rsy= spy(i) +dth*(spz(i)*qsx -spx(i)*qsz -spy(i)/tau_diss)
+      rsz= spz(i) +dth*(spx(i)*qsy -spy(i)*qsx &
+                                    -(spz(i) -aspz(i))/tau_diss) 
 ! RHS_para
       qq  = qsx**2 +qsy**2 +qsz**2
       rqq = (rsx*qsx +rsy*qsy +rsz*qsz)/qq
@@ -1587,7 +1587,7 @@
       um1= 0
 !
       do i= i1(rank),i2(rank)
-      ub1= ub1 + b1 * (Bex*spx(i) +Bey*spy(i) +Bez*spz(i))
+      ub1= ub1 + b1 * (bex*spx(i) +bey*spy(i) +bez*spz(i))
 !
       do k= 1,nintS(i)
       j= lintS(k,i)
@@ -1642,7 +1642,7 @@
 !
         ss= 0
         do 735 i= 1,np1
-        ss= ss +spx(i)*Bex +spy(i)*Bey +spz(i)*Bez  ! Bez= bz/B00
+        ss= ss +spx(i)*bex +spy(i)*bey +spz(i)*bez  ! bez= bz/B00
   735   continue
 !
         del_en= del_en - g*ss/np1
@@ -1714,8 +1714,8 @@
   737   continue
   738   continue
 !
-        Bextx(is)= B00*Bex
-        Bextz(is)= B00*Bez
+        bextx(is)= B00*bex
+        bextz(is)= B00*bez
       end if
       end if
 !
@@ -1791,8 +1791,8 @@
         usb(is) =  ub/np1
 !
         t4 = t8
-        Bex4= B00*Bex
-        Bez4= B00*Bez
+        bex4= B00*bex
+        bez4= B00*bez
 !
 !--------------------
 !* Spin Temperature
@@ -1872,7 +1872,7 @@
 !
         write(11,771) t8,it,is,iter,Usys(is),U_Fe(is),U_O(is),conv(is), &
                  e_sp1,e_c_r1,e_LJ1,magz(is),ds_Fe(is),ds_O(is),wtime/60.d0
-  771   format('t=',f7.1,i8,i5,i4,1p7d10.2,0pf10.5,1p2d10.2,0pf8.2)
+  771   format('t=',f7.1,i8,i5,i4,1p7d10.2,d11.4,2d10.2,0pf8.2)
 !
         close (11)
       end if
@@ -1913,7 +1913,7 @@
         write(12) np1,np2,spec,site,nintS,lintS,nintC,lintC,if_LJ
         write(12) i1,i2,i3,i4,disp_recv,cnt_recv,disp_recvC,cnt_recvC, &
                   disp_recv0,cnt_recv0
-        write(12) spinx,spinz,spin7,Bextx,Bextz,magx,magy,magz, &
+        write(12) spinx,spinz,spin7,bextx,bextz,magx,magy,magz, &
                   Usys,conv,aitr,psdt,tfix,Uss,Usb,tsx,tsy,tsz,sum_mb, &
                   U_Fe,U_O,timeh
         close(12)
@@ -3548,11 +3548,11 @@
       call values (9.0,14.4,hh,qab4,0.,101)
 !
       Temp4= Temp
-      Bext4= sqrt(Bapx**2 +Bapy**2 +Bapz**2)  ! 100 gauss
+      bext4= sqrt(Bapx**2 +Bapy**2 +Bapz**2)  ! 100 gauss
       call symbol (13.0,16.0,hh,'Temp=', 0.,5)
       call values (15.0,16.0,hh,Temp4,0.,101)
       call symbol (13.0,15.2,hh,'Bapp=', 0.,5)
-      call values (15.0,15.2,hh,Bext4,0.,101)
+      call values (15.0,15.2,hh,bext4,0.,101)
 !
 !     xleng4= xleng4
       dt4 = dt
@@ -3841,7 +3841,7 @@
       implicit      none
       include      'param-spinRL7.h'
 !
-      real(C_float) spinx,spinz,spin7,Bextx,Bextz,magx,magy,magz, &
+      real(C_float) spinx,spinz,spin7,bextx,bextz,magx,magy,magz, &
                     Usys,conv,aitr,psdt,tfix,Uss,Usb,tsx,tsy,tsz, &
                     sum_mb,U_Fe,U_O,ds_Fe,ds_O,fdt4,vdt4,timeh,   &
                     cosd,sind,B00,Bmw,mue_B,hh,av_mz(nhs),ss,s2,  &
@@ -3849,7 +3849,7 @@
                     emin2,emin3,emin7,Energ(nhs),dEdt(nhs),www,   &
                     Ubm(nhs)
       common/ehist/ spinx(nhs),spinz(nhs),spin7(nhs), &
-                    Bextx(nhs),Bextz(nhs),magx(nhs),magy(nhs),magz(nhs),&
+                    bextx(nhs),bextz(nhs),magx(nhs),magy(nhs),magz(nhs),&
                     Usys(nhs),conv(nhs),aitr(nhs),psdt(nhs),tfix(nhs),  &
                     Uss(nhs),Usb(nhs),tsx(nhs,3),tsy(nhs,3),tsz(nhs,3), &
                     sum_mb(nhs),U_Fe(nhs),U_O(nhs),ds_Fe(nhs),ds_O(nhs),&
@@ -3902,7 +3902,7 @@
       ns= 0
 !
       do 200 k= is0,is-40
-      ss= ss +(magz(k) -av_mz(k))*Bextz(k)   ! magz= -g*<sz>
+      ss= ss +(magz(k) -av_mz(k))*bextz(k)   ! magz= -g*<sz>
       s2= s2 +(magz(k) -av_mz(k))**2         ! <dm**2>
       ns= ns +1
   200 continue
