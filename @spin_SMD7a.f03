@@ -1,14 +1,14 @@
 !*****************************************************************
 !*                                                               *
-!*   ### Spin Dissipative Molecular Dynamics Simulation ###      * 
+!*   ### Dissipative Spin Molecular Dynamics Simulation ###      * 
 !*                                                               *
 !*      Numerical code by:                                       *
 !*        Author: Motohiko Tanaka, PhD, Chikusa,Nagoya,Japan.    *
 !*        https://github.com/Mtanaka77/                          *
 !*                                                               *
-!*       @spin_SMD7a.f03: Numerical code                         *
+!*       @spin_SMD5a.f03: Numerical code                         *
 !*       param-spinRL7.h: Basic parameters                       *
-!*       SAI107_config.START1: Configuration file                *
+!*       SAI105_config.START1: Configuration file                *
 !*       magnetite8.xyz:  Initial xyz file                       * 
 !*                                                               *
 !*   Spin dynamics under the microwave B field for electrons,    *
@@ -354,8 +354,8 @@
                  f1,g1,b1,prb,qsx,qsy,qsz,rsx,rsy,rsz,hh1,hh2,  &
                  qq,rqq,dthg,dthqq,rdiv,spmin,                  &
                  alp,xx,yy,zz,rr,rr0,toler,deps,                &
-                 ss,smax,sav,t_unit,e_unit,a_unit,m_unit,m_Fe,m_O, &
-                 pi,pi2,th,ph,tmax,tmax0,cptot,unif1(2),unif2(2),  &
+                 ss,sav,t_unit,e_unit,a_unit,m_unit,m_Fe,m_O,   &
+                 pi,pi2,th,ph,tmax,tmax0,cptot,unif1(2),unif2(2), &
                  xleng0,yleng0,zleng0,sss,rlist(np0),           &
                  buffer1(4),buffer2(4),del_en,wtime,            &
                  fc3,J_ki,wfdt,vth0,vth_O,vth_Fe,vth,           &
@@ -1249,8 +1249,8 @@
 !                                                                         Reset
         call magnetiz7 (spx00,spy00,spz00,g,wx7,wy7,wz7,wn7,u1,uav7,wt7,np100,0)
       end if
-!                <- 2300: 114 lines above          
-      if(i_MC.lt.nstep_MC) go to 2300
+! 
+      if(i_MC.lt.nstep_MC) go to 2300    !<- 2300: 110 lines above
 !     -------------------------------
 !
 !
@@ -1272,19 +1272,20 @@
 ! Seed cell and multi-cells
           do 240 l= 1,np10
           i= i +1
-          spx(i)= spx00(l)  ! spx() are used in MD
+          spx(i)= spx00(l)    ! spx() are used in MD
           spy(i)= spy00(l)
           spz(i)= spz00(l)
   240     continue
 !
         else
-          do 243 l= 1,np10  !! np10 for each cell
+          do 243 l= 1,np10    ! np10 is for each cell of (ia,ja,ka)
           i= i +1
 !
 ! To avoid always being s=0... 11/23/2010
 !  Note: specifying spx(i)= sp2(i)*ranff(0) is not good
           th=  pi*ranff(0.d0)
           ph= pi2*ranff(0.d0)
+!
           spx(i)= sp2(i)*sin(th)*cos(ph)
           spy(i)= sp2(i)*sin(th)*sin(ph)
           spz(i)= sp2(i)*cos(th)
@@ -1300,7 +1301,7 @@
           close (11)
         end if
 !
-        go to 2100      !<-- 1000: 247 lines above
+        go to 2100      !<-- 1000: 274 lines above
 !
       else
         do 250 i= 1,np1
@@ -1315,10 +1316,10 @@
       end if
 !
       kstart= 1
-      it= 0          !<<-- 
+      it= 0             !<<-- 
       t8= 0.d0
 !
-      go to 1000     !<-- 1000: 326 lines above
+      go to 1000        !<-- 1000: 290 lines above
 !
 !
 !-----------------------------------------------------------
@@ -1411,6 +1412,7 @@
       rsy= spy(i) +dth*(spz(i)*qsx -spx(i)*qsz -spy(i)/tau_diss)
       rsz= spz(i) +dth*(spx(i)*qsy -spy(i)*qsx   &
                                    -(spz(i) -2.d0*aspz(i))/tau_diss) 
+!                           t8+dt <- t8+dth ..... t8
 !* RHS_para
       qq  = qsx**2 +qsy**2 +qsz**2
       rqq = (rsx*qsx +rsy*qsy +rsz*qsz)/qq
@@ -1460,7 +1462,6 @@
 !   -> iter= 6, error of 0.29% at t= 1000 ps
 !
       toler= 1.d-10
-      smax= 0
       sav= 0
       notconv= 0
 !
@@ -1468,7 +1469,6 @@
       ss= ((spx1(i) -spx0(i))**2 +(spy1(i) -spy0(i))**2  &
                                  +(spz1(i) -spz0(i))**2) &
                  /(spx0(i)**2 +spy0(i)**2 +spz0(i)**2)
-      smax= max(ss,smax)
       sav = sav +ss
 !
       if(abs(ss).gt.toler) then
@@ -1476,7 +1476,7 @@
       end if
   390 continue
 !                                 <- Return to 120 lines above
-      if(notconv.ne.0 .and. iter.lt.itermax) go to 400  !!<<-- 
+      if(notconv.ne.0 .and. iter.lt.itermax) go to 400 
 !     ------------------------------------------------
 !
 !* Decrease in spz(i) should be converted to s_perp(i), as sp2(i)= const.
@@ -1507,7 +1507,7 @@
       end if
 !
       call forces (fc1,fc2,fcLJ,alpha,e_sp,e_c_r,e_LJ, &
-                   i1,i2,i3,i4,rank,np1,np2,it)
+                   i1,i2,i3,i4,rank,np1,np2)
 !
 !----------------------
 !* Unify the forces
@@ -1872,7 +1872,7 @@
 !
         write(11,771) t8,it,is,iter,Usys(is),U_Fe(is),U_O(is),conv(is), &
                  e_sp1,e_c_r1,e_LJ1,magz(is),ds_Fe(is),ds_O(is),wtime/60.d0
-  771   format('t=',f7.1,i8,i5,i4,1p7d10.2,d11.4,2d10.2,0pf8.2)
+  771   format('t=',f7.1,i8,i5,i4,1p7d10.2,d11.3,2d10.2,0pf8.2)
 !
         close (11)
       end if
@@ -1956,7 +1956,7 @@
 !
 !-----------------------------------------------------------------------
       subroutine forces (fc1,fc2,fcLJ,alpha,e_sp,e_c_r,e_LJ, &
-                         i1,i2,i3,i4,rank,np1,np2,it)
+                         i1,i2,i3,i4,rank,np1,np2)
 !-----------------------------------------------------------------------
       use, intrinsic :: iso_c_binding
       implicit none
@@ -1971,7 +1971,7 @@
 
       integer(C_INT) n_of_j,i1(0:num_proc),i2(0:num_proc),       &
                  i3(0:num_proc),i4(0:num_proc),rank,nintS,lintS, &
-                 nintC,lintC,if_LJ,spec,site,np1,np2,i,j,k,l,it
+                 nintC,lintC,if_LJ,spec,site,np1,np2,i,j,k,l
       common/partcl1/ &
                  x(np0),y(np0),z(np0),spx(np0),spy(np0),spz(np0), &
                  ch(np0)
